@@ -1,0 +1,4 @@
+Potassium
+requests
+fastapi
+pydantic==1.10.4
