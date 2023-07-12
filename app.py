@@ -14,7 +14,6 @@ app_fastapi = FastAPI()
 queue_lock = threading.Lock()
 
 torch.load = safe.unsafe_torch_load
-device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
 
 list_models = None
 load_model = None
@@ -31,7 +30,6 @@ def unload_model():
         devices.torch_gc()
 
 def register_model(model=None):
-    # global model
     try:
         from modules import shared, sd_hijack
         if shared.sd_model is not model:
@@ -82,25 +80,15 @@ def init():
 
     modules.sd_models.list_models = noop
 
-    # webui.initialize()
     modules.script_callbacks.app_started_callback(None, app_fastapi)
     register_model(model=model)
 
-    context = {
-        "model": model
-    }
-
-    return context
-
 @app.handler(route="/txt2img")
 def handler(context: dict, request: Request) -> Response:
-    body = request.json.get("body")
-    # model_input = json.loads(body)
+    params = request.json.get("params")
 
-    params = body["params"]
     model_parameter = reqmodels.StableDiffusionTxt2ImgProcessingAPI(**params)
 
-    # webui.initialize()
     modules.script_callbacks.app_started_callback(None, app_fastapi)
     text_to_image = Api(app_fastapi, queue_lock)
     response = text_to_image.text2imgapi(model_parameter)

@@ -7,20 +7,18 @@ my_model = client.Client(
 )
 
 inputs = {
-    "body": {
-        "params": {
-            "prompt": "CAT",
-            "negative_prompt": "low quality",
-            "steps": 25,
-            "sampler_name": "Euler a",
-            "cfg_scale": 7.5,
-            "seed": 42,
-            "batch_size": 1,
-            "n_iter": 1,
-            "width": 400,
-            "height": 400,
-            "tiling": 'false',
-        }
+    "params": {
+        "prompt": "anime female in nepali dress",
+        "negative_prompt": "low quality",
+        "steps": 25,
+        "sampler_name": "Euler a",
+        "cfg_scale": 7.5,
+        "seed": 42,
+        "batch_size": 1,
+        "n_iter": 1,
+        "width": 400,
+        "height": 400,
+        "tiling": "false",
     }
 }
 
@@ -29,6 +27,6 @@ inputs = {
 # non-default endpoint, change the first
 # method argument ("/")to specify a
 # different route.
-result, meta = my_model.call("/text2img", inputs)
+result, meta = my_model.call("/txt2img", inputs)
 
 print(result)
