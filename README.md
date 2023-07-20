@@ -36,6 +36,32 @@ At the moment only one endpoint is implemented.
     }
     ```
 
+- `img2img` is the implementation of `/sdapi/v1/img2img` api
+
+    JSON INPUT
+    ```JSON
+    img2img_inputs = {
+        "params": {
+            "prompt": "blue banana",
+            "negative_prompt": "cartoonish, low quality",
+            "steps": 25,
+            "sampler_name": "Euler a",
+            "cfg_scale": 7.5,
+            "denoising_strength": 0.7,
+            "seed": 42,
+            "batch_size": 1,
+            "n_iter": 1,
+            "width": 768,
+            "height": 768,
+            "tiling": "false",
+            "init_images": [
+                "b64images"
+            ]
+        }
+    }
+    
+    ```
+
 ### Client Implementation in Python
 
 ```Python
@@ -47,30 +73,46 @@ my_model = client.Client(
     url="[MODEL_URL]",
 )
 
-inputs = {
-    "body": {
-        "params": {
-            "prompt": "CAT",
-            "negative_prompt": "low quality",
-            "steps": 25,
-            "sampler_name": "Euler a",
-            "cfg_scale": 7.5,
-            "seed": 42,
-            "batch_size": 1,
-            "n_iter": 1,
-            "width": 400,
-            "height": 400,
-            "tiling": 'false',
-        }
+txt2img_inputs = {
+    "params": {
+        "prompt": "Nurse in scrub dress with her hair tied",
+        "negative_prompt": "low quality",
+        "steps": 25,
+        "sampler_name": "Euler a",
+        "cfg_scale": 7.5,
+        "seed": 42,
+        "batch_size": 1,
+        "n_iter": 1,
+        "width": 400,
+        "height": 400,
+        "tiling": "false",
     }
 }
 
-# Call your model's inference endpoint on Banana.
-# If you have set up your Potassium app with a
-# non-default endpoint, change the first
-# method argument ("/")to specify a
-# different route.
-result, meta = my_model.call("/text2img", inputs)
+img2img_inputs = {
+    "params": {
+        "prompt": "blue banana",
+        "negative_prompt": "cartoonish, low quality",
+        "steps": 25,
+        "sampler_name": "Euler a",
+        "cfg_scale": 7.5,
+        "denoising_strength": 0.7,
+        "seed": 42,
+        "batch_size": 1,
+        "n_iter": 1,
+        "width": 768,
+        "height": 768,
+        "tiling": "false",
+        "init_images": [
+            "b64images"
+        ]
+    }
+}
 
-print(result)
+
+
+txt2img_result, meta = my_model.call("/txt2img", txt2img_inputs)
+img2img_result, meta = my_model.call("/img2img", img2img_inputs)
+
+print(txt2img_inputs, img2img_result)
 ```

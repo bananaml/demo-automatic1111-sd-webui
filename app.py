@@ -41,31 +41,6 @@ def register_model(model=None):
         print("Failed to hijack model.")
 
 
-def load_model_by_url(url, list_models=None, load_models=None):
-    # global list_models, load_model
-    import webui.modules.sd_models
-    import hashlib
-
-    hash_object = hashlib.md5(url.encode())
-    md5_hash = hash_object.hexdigest()
-
-    from download_checkpoint import download
-    download(url, md5_hash)
-
-    webui.modules.sd_models.list_models = list_models
-    webui.modules.sd_models.load_model = load_models
-
-    webui.modules.sd_models.list_models()
-
-    for m in webui.modules.sd_models.checkpoints_list.values():
-        if md5_hash in m.name:
-            load_model(m)
-            break
-
-    webui.modules.sd_models.list_models = noop
-    webui.modules.sd_models.load_model = noop
-
-
 @app.init
 def init():
 
@@ -87,8 +62,14 @@ def init():
 def handler(context: dict, request: Request) -> Response:
     params = request.json.get("params")
 
+    if 'width' not in params:
+        params['width'] = 768
+    if 'height' not in params:
+        params['height'] = 768
+
     model_parameter = reqmodels.StableDiffusionTxt2ImgProcessingAPI(**params)
 
+    # webui.initialize()
     modules.script_callbacks.app_started_callback(None, app_fastapi)
     text_to_image = Api(app_fastapi, queue_lock)
     response = text_to_image.text2imgapi(model_parameter)
@@ -97,6 +78,28 @@ def handler(context: dict, request: Request) -> Response:
         json={"output": response.images[0]},
         status=200
     )
+
+@app.handler(route="/img2img")
+def imghandler(context: dict, request: Request) -> Response:
+    params = request.json.get("params")
+
+    if 'width' not in params:
+        params['width'] = 768
+    if 'height' not in params:
+        params['height'] = 768
+
+    model_parameter = reqmodels.StableDiffusionImg2ImgProcessingAPI(**params)
+    modules.script_callbacks.app_started_callback(None, app_fastapi)
+    image_to_image = Api(app_fastapi, queue_lock)
+    response = image_to_image.img2imgapi(model_parameter)
+    imageb64 = response.images
+    
+    return Response(
+        json={
+            "output": imageb64[0]},
+            status=200
+    )
+
 
 @app.handler()
 def default(context: dict, request: Request) -> Response:
